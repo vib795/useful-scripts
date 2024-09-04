@@ -3,9 +3,16 @@ import re
 
 def search_files(directory, search_word, output_file):
     with open(output_file, 'w') as out_file:
-        for root, _, files in os.walk(directory):
+        for root, dirs, files in os.walk(directory):
+            # Skip searching in .git directories
+            if '.git' in dirs:
+                dirs[:] = [d for d in dirs if d != '.git']
+            
             for file in files:
                 file_path = os.path.join(root, file)
+                # Skip files in .git directories
+                if '.git' in file_path.split(os.path.sep):
+                    continue
                 try:
                     with open(file_path, 'r', encoding='utf-8') as f:
                         content = f.read()
