@@ -4,6 +4,14 @@ import re
 def is_git_directory(path):
     return '.git' in path.split(os.path.sep)
 
+def is_utf8_decodable(file_path):
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            f.read()
+        return True
+    except UnicodeDecodeError:
+        return False
+
 def search_files(directory, search_word, output_file):
     with open(output_file, 'w', encoding='utf-8') as out_file:
         for root, dirs, files in os.walk(directory):
@@ -15,8 +23,12 @@ def search_files(directory, search_word, output_file):
                 # Skip files in .git directories
                 if is_git_directory(file_path):
                     continue
+                # Skip files that can't be decoded with UTF-8
+                if not is_utf8_decodable(file_path):
+                    print(f"Skipping non-UTF-8 file: {file_path}")
+                    continue
                 try:
-                    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                    with open(file_path, 'r', encoding='utf-8') as f:
                         content = f.read()
                         matches = len(re.findall(r'\b' + re.escape(search_word) + r'\b', content, re.IGNORECASE))
                         if matches > 0:
