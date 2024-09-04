@@ -32,7 +32,8 @@ def search_files(directory, search_word, output_file):
                         content = f.read()
                         matches = len(re.findall(r'\b' + re.escape(search_word) + r'\b', content, re.IGNORECASE))
                         if matches > 0:
-                            out_file.write(f"{file_path}-{matches}\n")
+                            relative_path = os.path.relpath(file_path, directory)
+                            out_file.write(f"{relative_path}-{matches}\n")
                 except Exception as e:
                     print(f"Error reading file {file_path}: {str(e)}")
 
